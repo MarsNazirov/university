@@ -25,6 +25,7 @@
                 <th>Свободно</th>
                 <th>Статус</th>
                 <th>Жильцы</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +48,13 @@
                     @foreach($room->students as $student)
                         {{ $student->full_name }}<br>
                     @endforeach
+                </td>
+                <td>
+                    @if($freeBeds > 0 && $room->status === 'available')
+                        <a href="{{ route('rooms.create', $room->id) }}">Заселить</a>
+                    @else
+                        <span>Нет мест</span>
+                    @endif
                 </td>
             </tr>
             @endforeach
