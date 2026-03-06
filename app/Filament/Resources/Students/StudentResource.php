@@ -14,6 +14,11 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Notifications\Notification;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+
 
 class StudentResource extends Resource
 {
@@ -31,17 +36,54 @@ class StudentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->columns([
-            TextColumn::make('full_name')->searchable(),
-            TextColumn::make('email'),
-            TextColumn::make('group'),
-            TextColumn::make('course'),
-            TextColumn::make('status')->badge(),
-            TextColumn::make('room.number')->label('Комната'),
-        ])
-        ->filters([
-            //
-        ]);
+            ->columns([
+                TextColumn::make('full_name')->searchable()->label('ФИО'),
+                TextColumn::make('email')->label('Email'),
+                TextColumn::make('group')->label('Группа'),
+                TextColumn::make('course')->label('Курс'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'expelled' => 'danger',
+                        'academic_leave' => 'warning',
+                    })
+                    ->label('Статус'),
+                TextColumn::make('room.number')->label('Комната'),
+            ])
+            ->filters([
+                // можно добавить фильтры по статусу, группе и т.д.
+            ])
+            ->actions([
+                // Действие "Выселить"
+                Action::make('evict')
+                    ->label('Выселить')
+                    ->icon('heroicon-o-user-minus')
+                    ->visible(fn (Student $record): bool => !is_null($record->room_id))
+                    ->requiresConfirmation()
+                    ->action(function (Student $record) {
+                        $room = $record->room;
+                        $record->room_id = null;
+                        $record->save();
+
+                        if ($room) {
+                            $room->load('students');
+                            // Если комната была занята и освободилось место
+                            if ($room->students()->count() < $room->beds_count && $room->status === 'occupied') {
+                                $room->status = 'available';
+                                $room->save();
+                            }
+                        }
+
+                        Notification::make()
+                            ->title('Студент выселен')
+                            ->success()
+                            ->send();
+                    }),
+            ])
+            ->bulkActions([
+                // можно добавить массовые действия
+            ]);
     }
 
     public static function getRelations(): array
@@ -58,5 +100,10 @@ class StudentResource extends Resource
             'create' => CreateStudent::route('/create'),
             'edit' => EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('room');
     }
 }
