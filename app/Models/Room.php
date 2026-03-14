@@ -25,4 +25,18 @@ class Room extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public function scopeAvailable($query)
+    {
+        $query->where('status', '=', 'available');
+    }
+
+    public function isAvailable()
+    {
+        if ($this->status !== 'available') {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
