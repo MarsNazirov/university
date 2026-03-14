@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\Student;
+use App\Services\RoomService;
+use Exception;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -19,13 +21,10 @@ class RoomController extends Controller
 
     public function create(Room $room)
     {
-        if ($room->status !== 'available') {
-            return redirect()->route('rooms');
-        }
+        $room->isAvailable();
 
         $students = Student::where('room_id', '=', null)->get();
 
-        // dd($room);
         
         return view('rooms.create', [
             'room' => $room,
@@ -33,25 +32,14 @@ class RoomController extends Controller
         ]);
     }
 
-    public function update(Request $request, Room $room)
+    public function update(Student $student, Room $room, RoomService $roomService)
     {  
-        // dd($room->count());
+        try {
+            $roomService->studentCheckin($room, $student);
 
-        if ($room->status !== 'available') {
-            return redirect()->route('rooms');
+            return redirect()->route('rooms')->with('success', 'Заселен');
+        } catch (\Exception $e) {
+            return redirect()->route('rooms')->with('error', $e->getMessage());
         }
-
-        $student = Student::find($request->input('student_id'));
-
-        $student->update([
-            'room_id' => $room->id
-        ]);  
-
-        if ($room->students->count() === $room->beds_count) {
-            $room->status = 'occupied';
-            $room->save();
-        }
-
-        return redirect()->route('rooms');
     }
 }

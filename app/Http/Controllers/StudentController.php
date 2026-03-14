@@ -34,8 +34,6 @@ class StudentController extends Controller
             $room->save();
         }
 
-        
-
         return redirect()->back();
     }
 }
