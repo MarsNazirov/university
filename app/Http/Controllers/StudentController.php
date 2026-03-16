@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\Student;
+use App\Services\RoomService;
+use Exception;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -15,25 +17,14 @@ class StudentController extends Controller
         return view('students.index', compact('students'));
     }
 
-    public function evict(Student $student)
+    public function evict(Student $student, RoomService $roomService)
     {
-        $old_room_id = $student->room_id;
+        try {
+            $roomService->studentEvict($student);
 
-        if (!$old_room_id) {
-            return redirect()->back();
+            return redirect()->route('students')->with('success', 'Студент выселен');
+        } catch (Exception $e) {
+            return redirect()->route('students')->with('error', 'Неудалось выселить студента');
         }
-
-        $student->update([
-            'room_id' => null
-        ]);
-
-        $room = Room::find($old_room_id);
-
-        if ($room->students->count() < $room->beds_count) {
-            $room->status = 'available';
-            $room->save();
-        }
-
-        return redirect()->back();
     }
 }
