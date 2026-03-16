@@ -10,6 +10,18 @@
 </head>
 <body>
     <h1>Студенты в общежитии</h1>
+
+    @if(session('success'))
+        <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            {{ session('error') }}
+        </div>
+    @endif
     
     <table>
         <thead>
