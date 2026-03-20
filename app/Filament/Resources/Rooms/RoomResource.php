@@ -83,13 +83,32 @@ class RoomResource extends Resource
     {
         return $table
         ->columns([
-            TextColumn::make('number')->sortable()->searchable(),
-            TextColumn::make('floor')->sortable(),
-            TextColumn::make('type'),
-            TextColumn::make('price')->money('rub'),
+            TextColumn::make('number')->sortable()->searchable()->label('Номер'),
+            TextColumn::make('floor')->sortable()->label('Этаж'),
+            TextColumn::make('type')
+            ->label('Тип')
+            ->formatStateUsing(fn ($state) => match ($state) {
+                'male'   => 'Мужская',
+                'female' => 'Женская',
+                default  => $state,
+            })
+            ->badge()
+            ->color(fn ($state) => $state === 'male' ? 'info' : 'warning'),
+            TextColumn::make('price')->money('rub')->label('Цена'),
             TextColumn::make('beds_count')->label('Мест'),
-            TextColumn::make('status')->badge(),
-            // Новая колонка со студентами
+            TextColumn::make('status')
+                ->label('Статус')
+                ->formatStateUsing(fn ($state) => match ($state) {
+                    'available' => 'Свободна',
+                    'occupied' => 'Занята',
+                    'repair' => 'Ремонт',
+                    default => $state,
+                })
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                    'available' => 'success', 
+                    'occupied' => 'danger'
+                }),
             TextColumn::make('students.full_name')
                 ->label('Жильцы')
                 ->listWithLineBreaks()
@@ -117,6 +136,7 @@ class RoomResource extends Resource
                 ->searchable()
                 ->required(),
         ];
+        
     })
     ->action(function (array $data, Room $record) {
             $student = Student::find($data['student_id']);

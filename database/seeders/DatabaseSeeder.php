@@ -19,10 +19,30 @@ class DatabaseSeeder extends Seeder
 
         $rooms = Room::factory()->count(20)->create();
 
-        for ($i = 0; $i < 50; $i++) {
-            Student::factory()->create([
-                'room_id' => $rooms->random()->id
+        $totalStudents = 0;
+        $targetTotal = 50;
+
+        foreach ($rooms as $room) {
+            $studentsInRoom = rand(0, $room->beds_count);
+
+            Student::factory()->count($studentsInRoom)->create([
+                'room_id' => $room->id
             ]);
+
+            $totalStudents += $studentsInRoom;
+
+            if ($totalStudents < $targetTotal) {
+                Student::factory()->count($targetTotal - $totalStudents)->create([
+                    'room_id' => null
+                ]);
+            }
+
+            foreach ($rooms as $room) {
+                $count = $room->students()->count();
+
+                $room->status = ($count === $room->beds_count) ? 'occupied' : 'available';
+                $room->save();
+            }
         }
 
         // User::factory()->create([
