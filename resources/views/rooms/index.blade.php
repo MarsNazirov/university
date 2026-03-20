@@ -50,12 +50,30 @@
             <tr class="{{ $rowClass }}">
                 <td>{{ $room->number }}</td>
                 <td>{{ $room->floor }}</td>
-                <td>{{ $room->type }}</td>
+                <td>
+                    @if ($room->type === 'male')
+                        Мужская
+                    @elseif($room->type === 'female')
+                        Женская
+                    @else 
+                        {{ $room->type }}
+                    @endif
+                </td>
                 <td>{{ $room->price }} ₽</td>
                 <td>{{ $room->beds_count }}</td>
                 <td>{{ $occupiedCount }}</td>
                 <td>{{ $freeBeds }}</td>
-                <td>{{ $room->status }}</td>
+                <td>
+                    @if($room->status === 'available')
+                        Свободна
+                    @elseif($room->status === 'occupied')
+                        Занята
+                    @elseif($room->status === 'repair')
+                        Ремонт
+                    @else
+                        {{ $room->status }}
+                    @endif
+                </td>
                 <td>
                     @foreach($room->students as $student)
                         {{ $student->full_name }}<br>

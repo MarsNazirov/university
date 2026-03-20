@@ -21,6 +21,10 @@ class RoomService
             throw new \Exception('Комната недоступна для заселения');
         }
 
+        if ($room->students->count() >= $room->beds_count) {
+            throw new \Exception('В комнате нет свободных мест');
+        }
+
         $student->update([
             'room_id' => $room->id
         ]);

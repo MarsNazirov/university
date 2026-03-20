@@ -42,13 +42,20 @@ class StudentResource extends Resource
                 TextColumn::make('group')->label('Группа'),
                 TextColumn::make('course')->label('Курс'),
                 TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'expelled' => 'danger',
-                        'academic_leave' => 'warning',
-                    })
-                    ->label('Статус'),
+                ->label('Статус')
+                ->formatStateUsing(fn ($state) => match ($state) {
+                    'active'          => 'Активный',
+                    'expelled'        => 'Отчислен',
+                    'academic_leave'  => 'Академический отпуск',
+                    default           => $state,
+                })
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                    'active'          => 'success',
+                    'expelled'        => 'danger',
+                    'academic_leave'  => 'warning',
+                    default           => 'gray',
+                }),
                 TextColumn::make('room.number')->label('Комната'),
             ])
             ->filters([

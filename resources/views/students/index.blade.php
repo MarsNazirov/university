@@ -57,7 +57,17 @@
                         -
                     @endif
                 </td>
-                <td>{{ $student->status }}</td>
+                <td>
+                    @if ($student->status === 'active')
+                        Активный
+                    @elseif ($student->status === 'expelled')
+                        Отчислен
+                    @elseif ($student->status === 'academic_leave')
+                        Академ.отпуск
+                    @else
+                        {{ $student->status }}
+                    @endif
+                </td>
                 <td>
                     @if ($student->room_id !== null)
                     <form action="{{ route('students.evict', $student->id) }}" method="POST">

@@ -19,10 +19,10 @@ class RoomFactory extends Factory
         return [
             'number' => fake()->unique()->numberBetween(1, 500),
             'floor' => fake()->numberBetween(1, 5),
-            'type' => fake()->randomElement(['male', 'female', 'family']),
+            'type' => fake()->randomElement(['male', 'female']),
             'price' => fake()->randomFloat(2, 2000, 4000),
             'beds_count' => fake()->numberBetween(1, 4),
-            'status' => fake()->randomElement(['available', 'occupied', 'repair']),
+            'status' => fake()->randomElement(['available', 'occupied']),
             'description' => fake()->paragraph(),
             'photo' => 'rooms/default.jpg'
         ];
