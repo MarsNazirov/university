@@ -11,7 +11,6 @@
 <body>
     <h1>Заселение в комнату {{ $room->number }}</h1>
     <p>Этаж: {{ $room->floor }}, мест: {{ $room->beds_count }}</p>
-
     <form action="{{ route('rooms.update', $room->id) }}" method="POST">
         @method('PATCH')
         @csrf

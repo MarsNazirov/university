@@ -8,6 +8,8 @@ use App\Services\RoomService;
 use Exception;
 use Illuminate\Http\Request;
 
+use const Dom\VALIDATION_ERR;
+
 class RoomController extends Controller
 {
     public function index()
@@ -24,7 +26,6 @@ class RoomController extends Controller
         $room->isAvailable();
 
         $students = Student::where('room_id', '=', null)->get();
-
         
         return view('rooms.create', [
             'room' => $room,
@@ -32,9 +33,10 @@ class RoomController extends Controller
         ]);
     }
 
-    public function update(Student $student, Room $room, RoomService $roomService)
+    public function update(Room $room, Request $request, RoomService $roomService)
     {  
         try {
+            $student = Student::findOrFail($request->input('student_id'));
             $roomService->studentCheckin($room, $student);
 
             return redirect()->route('rooms')->with('success', 'Заселен');
