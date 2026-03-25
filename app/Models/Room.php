@@ -10,9 +10,6 @@ class Room extends Model
 {
     use HasFactory;
 
-    const STATUS_AVAILABLE = 'свободная';
-    const STATUS_OCCUPIED = 'занятая';
-
     protected $fillable = [
         'number',
         'floor',

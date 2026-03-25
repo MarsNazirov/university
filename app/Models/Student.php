@@ -9,11 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Student extends Model
 {
     use HasFactory;
-
-    const STATUS_ACTIVE = 'активный';
-    const STATUS_EXPELLED = 'отчислен';
-    const STATUS_ACADEMIC_LEAVE = 'акодем.отпуск';
-
+    
     protected $fillable = [
         'full_name',
         'email',

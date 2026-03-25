@@ -25,6 +25,7 @@ class RoomService
             throw new \Exception('В комнате нет свободных мест');
         }
 
+
         $student->update([
             'room_id' => $room->id
         ]);
