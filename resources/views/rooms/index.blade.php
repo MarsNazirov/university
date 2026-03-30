@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Комнаты общежития</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .occupied { background-color: #ffe6e6; }
+        .available { background-color: #e6ffe6; }
+    </style>
+</head>
+<body>
+    <h1>Комнаты общежития</h1>
+
+    @if(session('success'))
+        <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            {{ session('error') }}
+        </div>
+    @endif
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Комната</th>
+                <th>Этаж</th>
+                <th>Тип</th>
+                <th>Цена</th>
+                <th>Всего мест</th>
+                <th>Занято</th>
+                <th>Свободно</th>
+                <th>Статус</th>
+                <th>Жильцы</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($rooms as $room)
+            @php
+                $occupiedCount = $room->students->count();
+                $freeBeds = $room->beds_count - $occupiedCount;
+                $rowClass = $room->status == 'available' ? 'available' : 'occupied';
+            @endphp
+            <tr class="{{ $rowClass }}">
+                <td>{{ $room->number }}</td>
+                <td>{{ $room->floor }}</td>
+                <td>
+                    @if ($room->type === 'male')
+                        Мужская
+                    @elseif($room->type === 'female')
+                        Женская
+                    @else 
+                        {{ $room->type }}
+                    @endif
+                </td>
+                <td>{{ $room->price }} ₽</td>
+                <td>{{ $room->beds_count }}</td>
+                <td>{{ $occupiedCount }}</td>
+                <td>{{ $freeBeds }}</td>
+                <td>
+                    @if($room->status === 'available')
+                        Свободна
+                    @elseif($room->status === 'occupied')
+                        Занята
+                    @elseif($room->status === 'repair')
+                        Ремонт
+                    @else
+                        {{ $room->status }}
+                    @endif
+                </td>
+                <td>
+                    @foreach($room->students as $student)
+                        {{ $student->full_name }}<br>
+                    @endforeach
+                </td>
+                <td>
+                    @if($freeBeds > 0 && $room->status === 'available')
+                        <a href="{{ route('rooms.create', $room->id) }}">Заселить</a>
+                    @else
+                        <span>Нет мест</span>
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    
+    <p>
+        <a href="/students">← К списку студентов</a>
+    </p>
+</body>
+</html>
